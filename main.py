@@ -1,9 +1,28 @@
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, json
 from datetime import datetime
 
 application = Flask(__name__)  # Создаем Flask-приложение
 # Начинаем писать мессенджер
+
+
 all_messages = []  # Список всех сообщений
+DB_FILE = "./data/db.json"
+
+
+# Чтение сообщений из файла
+def load_messages():
+    json_file = open(DB_FILE, 'r') # открываем для чтения
+    data = json.load(json_file)
+    return data["messages"]
+
+
+# Сохранение сообщений в файл
+def save_messages():
+    data = {
+        "messages": all_messages
+    }
+    json_file = open(DB_FILE, 'w') # открываем для записи
+    json.dump(data, json_file)
 
 
 @application.route("/chat")
@@ -58,7 +77,7 @@ def print_message(mess):
     print(f"[{mess['sender']}]: {mess['text']} / {mess['time']}")
 
 
-application.run()  # Запускаем приложение
+application.run(host='0.0.0.0', port=80)  # Запускаем приложение
 
 #  ДЗ:
 #  Предусмотреть ограничения для имени и текста (валидация данных) в фунции add_message
