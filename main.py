@@ -1,19 +1,19 @@
-from flask import Flask, request, render_template, json
+from flask import Flask, request, render_template
 from datetime import datetime
+import json
 
 application = Flask(__name__)  # Создаем Flask-приложение
-# Начинаем писать мессенджер
-
-
-all_messages = []  # Список всех сообщений
 DB_FILE = "./data/db.json"
 
 
 # Чтение сообщений из файла
 def load_messages():
-    json_file = open(DB_FILE, 'r') # открываем для чтения
+    json_file = open(DB_FILE, "r") # открываем для чтения
     data = json.load(json_file)
     return data["messages"]
+
+
+all_messages = load_messages() # список всех сообщений
 
 
 # Сохранение сообщений в файл
@@ -21,7 +21,7 @@ def save_messages():
     data = {
         "messages": all_messages
     }
-    json_file = open(DB_FILE, 'w') # открываем для записи
+    json_file = open(DB_FILE, "w") # открываем  для записи
     json.dump(data, json_file)
 
 
@@ -42,27 +42,28 @@ def get_messages():
 
 @application.route("/send_message")
 def send_message():
-    # name, text ?
     # Получаем информацию от пользователя
     sender = request.args["name"]
     text = request.args["text"]
 
-    # Узнаем длину имени пользователя и сообщения
-    lsender = len(sender)
-    ltext = len(text)
+    # Добавляем сообщение в список
+    add_message(sender, text)
 
-    # Проверяем длину имени пользователя и сообщения
-    if lsender < 3 or lsender > 100:
-        add_message('ERROR', 'Name must be in range [3...100]')
-    elif ltext < 1 or ltext > 3000:
-        add_message('ERROR', 'Text must be in range [1...3000]')
-    else:
-        # Добавляем сообщение в список
-        add_message(sender, text)
+    save_messages()
     return "OK"
 
 
 def add_message(sender, text):
+    # Узнаем длину имени пользователя и сообщения
+    # lsender = len(sender)
+    # ltext = len(text)
+
+    # Проверяем длину имени пользователя и сообщения
+    # if lsender < 3 or lsender > 100:
+    #    print('ERROR: Name must be in range [3...100]')
+    #elif ltext < 1 or ltext > 3000:
+        #print('ERROR: Text must be in range [1...3000]')
+    #else:
     # 1. Подготовить словарь с данными сообщения
     new_message = {
         "sender": sender,
